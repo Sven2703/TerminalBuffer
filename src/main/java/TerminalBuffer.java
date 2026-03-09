@@ -20,7 +20,7 @@ public class TerminalBuffer {
     public void clearScreen() {
         screen = new Cell[height][width];
     }
-    
+
     public void clearScreenAndScrollback() {
         screen = new Cell[height][width];
         scrollback = new Cell[maxScrollback][width];
@@ -192,6 +192,59 @@ public class TerminalBuffer {
         }
     }
 
+    public String getEntireScreenAndScrollback() {
+        StringBuilder res = new StringBuilder();
+        for (int i = 0; i < maxScrollback; i++) {
+            res.append(getLineScrollback(i));
+        }
+        res.append(getEntireScreen());
+        return res.toString();
+    }
+
+    public String getEntireScreen() {
+        StringBuilder res = new StringBuilder();
+        for (int i = 0; i < height; i++) {
+            res.append(getLineScreen(i));
+        }
+        return res.toString();
+    }
+
+    public String getLineScreen(int row) {
+        StringBuilder res = new StringBuilder();
+        if (row >= 0 && row < height) {
+            for (int j = 0; j < width; j++) {
+                res.append(getCharScreenAt(row, j));
+            }
+        }
+        return res.toString();
+    }
+
+    public String getLineScrollback(int row) {
+        StringBuilder res = new StringBuilder();
+        if (row >= 0 && row < maxScrollback) {
+            for (int j = 0; j < width; j++) {
+                res.append(getCharScrollbackAt(row, j));
+            }
+        }
+        return res.toString();
+    }
+
+    public char getCharScreenAt(int row, int column) {
+        if (column < width && column >= 0 && row >= 0 && row < height) {
+            if (this.screen[row][column] != null)
+                return this.screen[row][column].getCharacter();
+        }
+        return 0;
+    }
+
+    public char getCharScrollbackAt(int row, int column) {
+        if (column < width && column >= 0 && row >= 0 && row < maxScrollback) {
+            if (scrollback[row][column] != null)
+                return scrollback[row][column].getCharacter();
+        }
+        return 0;
+    }
+
     public void setForegroundColor(int foregroundColor) {
         this.foregroundColor = foregroundColor;
     }
@@ -238,6 +291,86 @@ public class TerminalBuffer {
         return cursorPositionRow;
     }
 
+    public int getBackgroundColorScreenAt(int row, int column) {
+        if (column < width && column >= 0 && row >= 0 && row < height) {
+            if (this.screen[row][column] != null)
+                return screen[row][column].getBackgroundColor();
+        }
+        return 0;
+    }
+
+    public int getForegroundColorScreenAt(int row, int column) {
+        if (column < width && column >= 0 && row >= 0 && row < height) {
+            if (this.screen[row][column] != null)
+                return screen[row][column].getForegroundColor();
+        }
+        return 0;
+    }
+
+    public boolean isItalicScreenAt(int row, int column) {
+        if (column < width && column >= 0 && row >= 0 && row < height) {
+            if (this.screen[row][column] != null)
+                return screen[row][column].isItalic();
+        }
+        return false;
+    }
+
+    public boolean isBoldScreenAt(int row, int column) {
+        if (column < width && column >= 0 && row >= 0 && row < height) {
+            if (this.screen[row][column] != null)
+                return screen[row][column].isBold();
+        }
+        return false;
+    }
+
+    public boolean isUnderlineScreenAt(int row, int column) {
+        if (column < width && column >= 0 && row >= 0 && row < height) {
+            if (this.screen[row][column] != null)
+                return screen[row][column].isUnderline();
+        }
+        return false;
+    }
+
+    public int getBackgroundColorScrollbackAt(int row, int column) {
+        if (column < width && column >= 0 && row >= 0 && row < maxScrollback) {
+            if (scrollback[row][column] != null)
+                return scrollback[row][column].getBackgroundColor();
+        }
+        return 0;
+    }
+
+    public int getForegroundColorScrollbackAt(int row, int column) {
+        if (column < width && column >= 0 && row >= 0 && row < maxScrollback) {
+            if (scrollback[row][column] != null)
+                return scrollback[row][column].getForegroundColor();
+        }
+        return 0;
+    }
+
+    public boolean isItalicScrollbackAt(int row, int column) {
+        if (column < width && column >= 0 && row >= 0 && row < maxScrollback) {
+            if (scrollback[row][column] != null)
+                return scrollback[row][column].isItalic();
+        }
+        return false;
+    }
+
+    public boolean isBoldScrollbackAt(int row, int column) {
+        if (column < width && column >= 0 && row >= 0 && row < maxScrollback) {
+            if (scrollback[row][column] != null)
+                return scrollback[row][column].isBold();
+        }
+        return false;
+    }
+
+    public boolean isUnderlineScrollbackAt(int row, int column) {
+        if (column < width && column >= 0 && row >= 0 && row < maxScrollback) {
+            if (scrollback[row][column] != null)
+                return scrollback[row][column].isUnderline();
+        }
+        return false;
+    }
+
     private class Cell {
         private int foregroundColor, backgroundColor;
         private char character;
@@ -250,6 +383,30 @@ public class TerminalBuffer {
             this.bold = bold;
             this.italic = italic;
             this.underline = underline;
+        }
+
+        private char getCharacter() {
+            return character;
+        }
+
+        public int getForegroundColor() {
+            return foregroundColor;
+        }
+
+        public int getBackgroundColor() {
+            return backgroundColor;
+        }
+
+        public boolean isBold() {
+            return bold;
+        }
+
+        public boolean isItalic() {
+            return italic;
+        }
+
+        public boolean isUnderline() {
+            return underline;
         }
     }
 }
