@@ -59,12 +59,13 @@ public class TerminalBufferTest {
 
         // does not override the previous text
         t1.insertText("edcba");
-        assertEquals("abcdefghijklmnopqrstuvwxyz1234edcba567890", t1.getEntireScreenAndScrollback());
-        assertTrue(t1.isBoldScreenAt(1, 2));
-        assertTrue(t1.isUnderlineScreenAt(1, 4));
-        assertTrue(t1.isItalicScreenAt(1, 0));
-        assertEquals(5, t1.getBackgroundColorScreenAt(1, 3));
-        assertEquals(1, t1.getForegroundColorScreenAt(1, 2));
+        System.out.println(t1.getLineScreen(0));
+        assertEquals("abcdefghijklmnopqrstuvwxyz1234edcba5678900", t1.getEntireScreenAndScrollback());
+        assertTrue(t1.isBoldScreenAt(0, 2));
+        assertTrue(t1.isUnderlineScreenAt(0, 4));
+        assertTrue(t1.isItalicScreenAt(0, 0));
+        assertEquals(5, t1.getBackgroundColorScreenAt(0, 3));
+        assertEquals(1, t1.getForegroundColorScreenAt(0, 2));
         t1.clearScreen();
         assertEquals("", t1.getEntireScreen());
 

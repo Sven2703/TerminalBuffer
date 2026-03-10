@@ -58,22 +58,26 @@ public class TerminalBuffer {
             writeCharacter(cursorPositionRow, cursorPositionColumn, c);
             if(cursorPositionRow == height - 1 && cursorPositionColumn == width - 1) {
                 insertEmptyLine();
-            } else if (cursorPositionColumn == width - 1) {
-                insertEmptyLineAt(cursorPositionRow + 1);
-            }
-            moveCursorRight(1);
+                if(height == 1)
+                    setCursorPositionColumn(0);
+                else
+                    moveCursorRight(1);
+            } else
+                moveCursorRight(1);
         }
         while(!append.isEmpty()) {
             if(screen[cursorPositionRow][cursorPositionColumn] != null)
                 append.add(screen[cursorPositionRow][cursorPositionColumn]);
-            screen[cursorPositionRow][cursorPositionColumn] = append.getFirst();
-            append.removeFirst();
+            screen[cursorPositionRow][cursorPositionColumn] = append.get(0);
+            append.remove(0);
             if(cursorPositionRow == height - 1 && cursorPositionColumn == width - 1) {
                 insertEmptyLine();
-            } else if (cursorPositionColumn == width - 1) {
-                insertEmptyLineAt(cursorPositionRow + 1);
-            }
-            moveCursorRight(1);
+                if(height == 1)
+                    setCursorPositionColumn(0);
+                else
+                    moveCursorRight(1);
+            } else
+                moveCursorRight(1);
         }
     }
 
