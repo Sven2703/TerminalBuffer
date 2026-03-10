@@ -31,6 +31,10 @@ public class TerminalBuffer {
         scrollback = new Cell[maxScrollback][width];
     }
 
+    /**
+     * Writes a text overriding the text that was previously there, moves the cursor.
+     * @param text The text to write
+     */
     public void writeText(String text) {
         char[] charArray = text.toCharArray();
         for(char c : charArray) {
@@ -46,6 +50,10 @@ public class TerminalBuffer {
         }
     }
 
+    /**
+     * Inserts text and moves not empty cells further back, moves the cursor
+     * @param text The text to insert
+     */
     public void insertText(String text) {
         List<Cell> append = new LinkedList<>();
         if (!lineIsEmpty(cursorPositionRow, cursorPositionColumn)) {
@@ -113,6 +121,10 @@ public class TerminalBuffer {
         }
     }
 
+    /**
+     * Inserts a new empty line at the bottom and moves every
+     * existing line towards the top and the first line to the scrollback.
+     */
     public void insertEmptyLine() {
         if(maxScrollback > 0) {
             for (int i = 1; i < maxScrollback; i++) {
@@ -131,12 +143,19 @@ public class TerminalBuffer {
         }
     }
 
+    /**
+     * Empties the rest of the line.
+     */
     public void fillLine() {
         for(int i = cursorPositionColumn; i < width; i++) {
             writeEmptyCell(cursorPositionRow, i);
         }
     }
 
+    /**
+     * Fills the rest of the line with a character.
+     * @param character to fill the line with
+     */
     public void fillLine(char character) {
         for(int i = cursorPositionColumn; i < width; i++) {
             writeCharacter(cursorPositionRow, i, character);
@@ -181,6 +200,10 @@ public class TerminalBuffer {
             moveCursorUp(-NCells);
     }
 
+    /**
+     * Moves the Cursor to the right if it reaches the end of the screen it starts on the left in the next line
+     * @param NCells number of cells to move the cursor
+     */
     public void moveCursorRight(int NCells) {
         if(NCells >= 0) {
             if (NCells + cursorPositionColumn < width)
@@ -197,6 +220,10 @@ public class TerminalBuffer {
             moveCursorLeft(-NCells);
     }
 
+    /**
+     * Moves the Cursor to the left if it reaches the end of the screen it starts on the right in the next line above
+     * @param NCells number of cells to move the cursor
+     */
     public void moveCursorLeft(int NCells) {
         if(NCells >= 0) {
             if (NCells <= cursorPositionColumn)
