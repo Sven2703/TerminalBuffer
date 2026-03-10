@@ -394,6 +394,18 @@ public class TerminalBuffer {
         return false;
     }
 
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public int getMaxScrollback() {
+        return maxScrollback;
+    }
+
     private class Cell {
         private int foregroundColor, backgroundColor;
         private char character;
