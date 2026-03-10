@@ -13,6 +13,11 @@ public class TerminalBuffer {
     }
 
     public TerminalBuffer(int width, int height, int maxScrollback) {
+        this.width = width;
+        this.height = height;
+        this.maxScrollback = maxScrollback;
+        if(height < 1 || width < 1 || maxScrollback < 0)
+            throw new RuntimeException("Buffer has no screen or negative scrollback");
         screen = new Cell[height][width];
         scrollback = new Cell[maxScrollback][width];
     }
@@ -32,8 +37,12 @@ public class TerminalBuffer {
             writeCharacter(cursorPositionRow, cursorPositionColumn, c);
             if(cursorPositionRow == height - 1 && cursorPositionColumn == width - 1) {
                 insertEmptyLine();
-            }
-            moveCursorRight(1);
+                if(height == 1)
+                    setCursorPositionColumn(0);
+                else
+                    moveCursorRight(1);
+            } else
+                moveCursorRight(1);
         }
     }
 
@@ -101,13 +110,17 @@ public class TerminalBuffer {
     }
 
     public void insertEmptyLine() {
-        moveCursorUp(1);
-        for(int i = 1; i < maxScrollback; i++) {
-            System.arraycopy(scrollback[i], 0, scrollback[i - 1], 0, width);
+        if(maxScrollback > 0) {
+            for (int i = 1; i < maxScrollback; i++) {
+                System.arraycopy(scrollback[i], 0, scrollback[i - 1], 0, width);
+            }
+            System.arraycopy(screen[0], 0, scrollback[maxScrollback - 1], 0, width);
         }
-        System.arraycopy(scrollback[maxScrollback - 1], 0, screen[0], 0, width);
-        for(int i = 1; i < height; i++) {
-            System.arraycopy(screen[i], 0, screen[i - 1], 0, width);
+        if(height > 1) {
+            moveCursorUp(1);
+            for (int i = 1; i < height; i++) {
+                System.arraycopy(screen[i], 0, screen[i - 1], 0, width);
+            }
         }
         for(int j = 0; j < width; j++) {
             writeEmptyCell(height - 1, j);
@@ -145,25 +158,27 @@ public class TerminalBuffer {
     }
 
     public void moveCursorUp(int NCells) {
-        if(NCells > 0) {
+        if(NCells >= 0) {
             if (NCells <= cursorPositionRow)
                 cursorPositionRow -= NCells;
             else
                 cursorPositionRow = 0;
-        }
+        } else
+            moveCursorDown(-NCells);
     }
 
     public void moveCursorDown(int NCells) {
-        if(NCells > 0) {
+        if(NCells >= 0) {
             if (NCells + cursorPositionRow < height)
                 cursorPositionRow += NCells;
             else
                 cursorPositionRow = height - 1;
-        }
+        } else
+            moveCursorUp(-NCells);
     }
 
     public void moveCursorRight(int NCells) {
-        if(NCells > 0) {
+        if(NCells >= 0) {
             if (NCells + cursorPositionColumn < width)
                 cursorPositionColumn += NCells;
             else if (cursorPositionRow + 1 < height) {
@@ -174,11 +189,12 @@ public class TerminalBuffer {
             } else
                 //Cursor is in the bottom right
                 cursorPositionColumn = width - 1;
-        }
+        } else
+            moveCursorLeft(-NCells);
     }
 
     public void moveCursorLeft(int NCells) {
-        if(NCells > 0) {
+        if(NCells >= 0) {
             if (NCells <= cursorPositionColumn)
                 cursorPositionColumn -= NCells;
             else if (cursorPositionRow > 0) {
@@ -189,7 +205,8 @@ public class TerminalBuffer {
             } else
                 //Cursor is in the top left
                 cursorPositionColumn = 0;
-        }
+        } else
+            moveCursorRight(-NCells);
     }
 
     public String getEntireScreenAndScrollback() {
@@ -213,7 +230,9 @@ public class TerminalBuffer {
         StringBuilder res = new StringBuilder();
         if (row >= 0 && row < height) {
             for (int j = 0; j < width; j++) {
-                res.append(getCharScreenAt(row, j));
+                char character = getCharScreenAt(row, j);
+                if(character != 0)
+                    res.append(character);
             }
         }
         return res.toString();
@@ -223,7 +242,9 @@ public class TerminalBuffer {
         StringBuilder res = new StringBuilder();
         if (row >= 0 && row < maxScrollback) {
             for (int j = 0; j < width; j++) {
-                res.append(getCharScrollbackAt(row, j));
+                char character = getCharScrollbackAt(row, j);
+                if(character != 0)
+                    res.append(character);
             }
         }
         return res.toString();
@@ -246,11 +267,13 @@ public class TerminalBuffer {
     }
 
     public void setForegroundColor(int foregroundColor) {
-        this.foregroundColor = foregroundColor;
+        if(foregroundColor >= 0 && foregroundColor <= 16)
+            this.foregroundColor = foregroundColor;
     }
 
     public void setBackgroundColor(int backgroundColor) {
-        this.backgroundColor = backgroundColor;
+        if(backgroundColor >= 0 && backgroundColor <= 16)
+            this.backgroundColor = backgroundColor;
     }
 
     public void setBold(boolean bold) {
